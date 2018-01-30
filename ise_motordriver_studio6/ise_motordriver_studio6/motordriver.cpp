@@ -11,7 +11,7 @@
 //20khz
 //10khz
 //1khz
-#define TOP 61
+const int TOP=61;
 enum{
 	TMR0Full = TOP,//255,
 	TMR0INI = 0, //122,
@@ -26,7 +26,7 @@ int motor_init(void)
 }
 
 int pwm_map (int duty){
-	return TMR0INI + (int)(0.61*duty); //duty=0~100
+	return TMR0INI + (int)(TOP/100*duty); //duty=0~100
 }
 	
 	
