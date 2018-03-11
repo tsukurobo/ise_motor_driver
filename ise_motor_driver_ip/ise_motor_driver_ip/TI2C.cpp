@@ -20,6 +20,13 @@ void TI2C_init(uint8_t address, void (*recv)(char*), void (*req)(char*)){
 	I2C_setCallbacks(TI2C_char_received, TI2C_requested);
 }
 
+void TI2C_init_sync(uint8_t address, void (*recv)(char*), void (*req)(char*)){
+	TI2C_recv_cb = recv;
+	TI2C_req_cb = req;
+	I2C_init_sync(address);
+	I2C_setCallbacks(TI2C_char_received, TI2C_requested);
+}
+
 
 void TI2C_received(char *str) //slave <-
 {
