@@ -31,7 +31,6 @@ void TI2C_init_sync(uint8_t address, void (*recv)(char*), void (*req)(char*)){
 void TI2C_received(char *str) //slave <-
 {
 	TI2C_recv_cb(str);
-	// printf();
 }
 
 void TI2C_requested() //¨master

@@ -20,7 +20,7 @@ enum{
 int motor_init(void)
 {
 	//setup
-	DDRD = 0b11100000;
+	DDRD |= 0b11100000;
 	
 	TCCR0A = 0b10100011;  //highspeedPWM
 	
@@ -39,11 +39,13 @@ int motor_set_speed (int power) {
 	    OCR0B = pwm_map(abs(power));
 
 		if (power < 0){
-			PORTD = 0b01100000;	  //PHASE=high
+			//PORTD = 0b01100000;	  //PHASE=high
+			PORTD &= 0b01111111;
 		}
 		
 		else if(power > 0){
-			PORTD = 0b11100000;   //PHASE=low
+			//PORTD = 0b11100000;   //PHASE=low
+			PORTD |= 0b10000000;
 		}
 				
 }

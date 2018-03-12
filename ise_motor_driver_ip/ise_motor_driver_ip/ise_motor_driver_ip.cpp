@@ -16,12 +16,11 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
-#define I2C_ADDR 0x10
-
+#define I2C_ADDR 0x14
 
 
 volatile long count = 0;
-volatile int pw = 50;
+volatile int pw = 0;
 
 void i2c_received_cb(char* str) {
 	motor_set_speed(atoi(str));
@@ -30,14 +29,10 @@ void i2c_received_cb(char* str) {
 void i2c_request_cb(char* buf) {
 	// set TI2C_buf_send.str_buf
 	//strcpy(buf, "Hello World\n");
-	sprintf(buf,"%ld",count, pw);
-	//count -= 1;
-	//pw -=1;
+	sprintf(buf,"%ld",count);
 }
 
-ISR(PCINT1_vect, ISR_NOBLOCK){//jumon
-	//sei();
-    //count += 100;
+ISR(PCINT1_vect, ISR_NOBLOCK){//encorder
 	if((PINC & (1 << PINC0)) ^ ((PINC & (1 << PINC1))>> 1))--count;
 	else ++count;	
 }
@@ -45,9 +40,9 @@ ISR(PCINT1_vect, ISR_NOBLOCK){//jumon
 
 void setup (){
 	
-	//ピン変化割り込み許可（PCINT0~7）
+	//ピン変化割り込み許可（PCINT8~15）
 	PCICR |= (1<<PCIE1);
-	//ピン変化割り込み許可（PCINT0）
+	//ピン変化割り込み許可（PCINT8）
 	PCMSK1 |= (1<<PCINT8);
 	motor_init();
 	motor_set_speed(pw);
@@ -55,6 +50,8 @@ void setup (){
 	DDRC = 0x00;
 	PORTC = 0x00;
 	
+	// LED of addresses 0x10~ 0x1F 0~F -> 0~15
+	PORTD |= (0b00001111 & I2C_ADDR);
 
 	//sei();
 	
@@ -65,14 +62,10 @@ void setup (){
 int main(void)
 {
 	setup();
-	motor_set_speed(pw);
+	
     /* Replace with your application code */
     while (1) 
     {
-		
-		//motor_set_speed(pw);
-		//pw--;
-		//_delay_ms(100);
 		I2C_main();
     }
 }
