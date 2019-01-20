@@ -18,7 +18,7 @@
 #include <util/delay.h>
 
 
-#define I2C_ADDR 0x33
+#define I2C_ADDR 0x35
 
 
 volatile long count = 0;
@@ -27,7 +27,8 @@ volatile int target_enc = 0;
 volatile long timer_count = 0;
 
 void i2c_received_cb(char* str) {
-	motor_set_speed(atoi(str));
+	//motor_set_speed(atoi(str));
+	target_enc = atoi(str);
 }
 
 void i2c_request_cb(char* buf) {
@@ -37,25 +38,28 @@ void i2c_request_cb(char* buf) {
 }
 
 void pid() {
-  double KP = 0.01;
-  double KI = 0;
-  double KD = 0;
+  int max_pow = 30;
+  double KP = 1.0;
+  double KI = 0.01;
+  double KD = 0.01;
   double p , i , d ;
-  double integral ;
-  double power;
+
+  static double power;
   
-  double dt = 0.01; // 0.1sec
+  double dt = 0.0001; // sec
   
+  static double integral ;
   static double now_diff;   
   static double pre_enc;	
   static double pre_diff;
   double now_enc = count;
+
   
   now_enc = count;
   pre_diff = now_diff;
   now_diff = target_enc - now_enc;
-  if(now_diff>320)power=40;
-  else if(now_diff<-320)power=-40;
+  if(now_diff>320)power=max_pow;
+  else if(now_diff<-320)power=-max_pow;
   else{
   integral += now_diff * dt;
 
@@ -63,20 +67,21 @@ void pid() {
   i = KI * integral ;
   d = KD * (now_diff - pre_diff) /dt;
   
-  power = power+ p + i + d;
+  //power = power+ p + i + d;
+  power = p + i + d;
   if(fabs(target_enc)<0.05 && fabs(now_enc)<0.01 /*&&fabs(power) < 10*/)
   {
     integral = 0;
     power = 0;
 
   }
-  else if(40 < power )
-    power = 40;
-  else if(power < -40)
-    power = -40;
+  else if(max_pow < power )
+    power = max_pow;
+  else if(power < -max_pow)
+    power = -max_pow;
   }
  //return power;  
-	motor_set_speed(-1*power);
+	motor_set_speed(power);
 }
 
 ISR(PCINT1_vect, ISR_NOBLOCK){//encorder
@@ -131,7 +136,7 @@ int main(void)
     while (1) 
     {
 		while( !(TWCR & (1 << TWINT))){
-			if (i > 1000){
+			if (i > 10){
 				pid();
 				i = 0;
 			}
