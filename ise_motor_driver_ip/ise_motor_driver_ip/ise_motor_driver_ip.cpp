@@ -18,17 +18,17 @@
 #include <util/delay.h>
 
 
-#define I2C_ADDR 0x35
+#define I2C_ADDR 0x21
 
 
 volatile long count = 0;
 volatile int pw = 0;
-volatile int target_enc = 0;
+volatile int target_vel = 0;
 volatile long timer_count = 0;
 
 void i2c_received_cb(char* str) {
 	//motor_set_speed(atoi(str));
-	target_enc = atoi(str);
+	target_vel = atoi(str);
 }
 
 void i2c_request_cb(char* buf) {
@@ -38,7 +38,7 @@ void i2c_request_cb(char* buf) {
 }
 
 void pid() {
-  int max_pow = 30;
+  int max_pow = 50;
   double KP = 1.0;
   double KI = 0.01;
   double KD = 0.01;
@@ -50,14 +50,19 @@ void pid() {
   
   static double integral ;
   static double now_diff;   
+  static double pre_vel;
+  static double now_vel;
   static double pre_enc;	
   static double pre_diff;
   double now_enc = count;
 
-  
+  pre_enc = now_enc;
   now_enc = count;
+  pre_vel = now_vel;
+  now_vel = (pre_enc - now_enc)/dt;
+  
   pre_diff = now_diff;
-  now_diff = target_enc - now_enc;
+  now_diff = target_vel - now_vel;
   if(now_diff>320)power=max_pow;
   else if(now_diff<-320)power=-max_pow;
   else{
@@ -69,7 +74,7 @@ void pid() {
   
   //power = power+ p + i + d;
   power = p + i + d;
-  if(fabs(target_enc)<0.05 && fabs(now_enc)<0.01 /*&&fabs(power) < 10*/)
+  if(fabs(target_vel)<0.05 && fabs(now_vel)<0.01 /*&&fabs(power) < 10*/)
   {
     integral = 0;
     power = 0;
@@ -122,7 +127,7 @@ void setup (){
 
 	//sei();
 	//motor_set_speed(30);
-	//motor_set_speed(-30);
+	motor_set_speed(-30);
 	TI2C_init_sync(I2C_ADDR,i2c_received_cb, i2c_request_cb);
 }
 
