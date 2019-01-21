@@ -4,7 +4,6 @@
 
 #include <util/twi.h>
 #include <avr/interrupt.h>
-//#include <util/delay.h>
 
 #include "I2CSlave.h"
 
@@ -49,66 +48,34 @@ void I2C_stop(void)
 void I2C_main()
 {
 	//é©à∂SLA+RéÛêMÇ‹Ç≈ë“ã@
-	while( !(TWCR & (1 << TWINT))){
-	//_delay_us(10);
-	}
-		
-	switch(TW_STATUS)
-	{
-		case TW_SR_DATA_ACK:
-		// received data from master, call the receive callback
-		I2C_recv(TWDR);
-		TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN);
-		break;
-		case TW_ST_SLA_ACK:
-		// master is requesting data, call the request callback
-		I2C_req();
-		TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN);
-		break;
-		case TW_ST_DATA_ACK:
-		// master is requesting data, call the request callback
-		I2C_req();
-		TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN);
-		break;
-		case TW_BUS_ERROR:
-		// some sort of erroneous state, prepare TWI to be readdressed
-		TWCR = 0;
-		TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN);
-		break;
-		default:
-		TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN);
-		break;
-	}
-}
-
-void I2C_body() {
-	switch(TW_STATUS)
-	{
-		case TW_SR_DATA_ACK:
-		// received data from master, call the receive callback
-		I2C_recv(TWDR);
-		TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN);
-		break;
-		case TW_ST_SLA_ACK:
-		// master is requesting data, call the request callback
-		I2C_req();
-		TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN);
-		break;
-		case TW_ST_DATA_ACK:
-		// master is requesting data, call the request callback
-		I2C_req();
-		TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN);
-		break;
-		case TW_BUS_ERROR:
-		// some sort of erroneous state, prepare TWI to be readdressed
-		TWCR = 0;
-		TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN);
-		break;
-		default:
-		TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN);
-		break;
-	}	
+	while( !(TWCR & (1 << TWINT)));
 	
+	switch(TW_STATUS)
+	{
+		case TW_SR_DATA_ACK:
+		// received data from master, call the receive callback
+		I2C_recv(TWDR);
+		TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN);
+		break;
+		case TW_ST_SLA_ACK:
+		// master is requesting data, call the request callback
+		I2C_req();
+		TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN);
+		break;
+		case TW_ST_DATA_ACK:
+		// master is requesting data, call the request callback
+		I2C_req();
+		TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN);
+		break;
+		case TW_BUS_ERROR:
+		// some sort of erroneous state, prepare TWI to be readdressed
+		TWCR = 0;
+		TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN);
+		break;
+		default:
+		TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN);
+		break;
+	}
 }
 
 
