@@ -20,10 +20,10 @@
 
 #define I2C_ADDR 0x63
 
-  int max_pow = 100;
-  double KP = 1.0;
-  double KI = 0.01;
-  double KD = 0.01;
+int max_pow = 100;
+double KP = 1.0;
+double KI = 0.01;
+double KD = 0.01;
 
 
 volatile long count = 0;
@@ -61,6 +61,7 @@ void i2c_received_cb(char* str) {
 		for (i = i+3; i < 1000; i++){
 			if (str[i] == ',') {
 				KD = atof(dgain);
+				break;
 			}
 			dgain[j] = str[i];
 			j++;
