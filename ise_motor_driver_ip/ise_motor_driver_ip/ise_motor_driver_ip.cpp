@@ -20,15 +20,60 @@
 
 #define I2C_ADDR 0x24
 
+int max_pow = 50;
+double KP = 1;
+double KI = 0.01;
+double KD = 0.01;
+
 
 volatile long count = 0;
 volatile int pw = 0;
 volatile int target_enc = 0;
 volatile long timer_count = 0;
 
+
 void i2c_received_cb(char* str) {
 	//motor_set_speed(atoi(str));
-	target_enc = atoi(str);
+	if (str[0] == 'a') {
+		// a:p=1.0,i=0.1,d=1.0,
+		int i = 0;
+		int j = 0;
+		char pgain[100];
+		char igain[100];
+		char dgain[100];
+		for (i = 4; i < 1000; i++){
+			if (str[i] == ',') {
+				KP = atof(pgain);
+				break;
+			}
+			pgain[j] = str[i];
+			j++;
+		}
+		j = 0;
+		for (i = i+3; i < 1000; i++){
+			if (str[i] == ',') {
+				KI = atof(igain);
+				break;
+			}
+			igain[j] = str[i];
+			j++;
+		}
+
+		j = 0;
+		for (i = i+3; i < 1000; i++){
+			if (str[i] == ',') {
+				KD = atof(dgain);
+
+                          return;
+			}
+			dgain[j] = str[i];
+			j++;
+		}
+
+	} else {
+		// -50, 30...
+		target_enc = atoi(str);
+	}
 }
 
 void i2c_request_cb(char* buf) {
@@ -38,10 +83,7 @@ void i2c_request_cb(char* buf) {
 }
 
 void pid() {
-  int max_pow = 50;
-  double KP = 1;
-  double KI = 0.01;
-  double KD = 0.01;
+
   double p , i , d ;
 
   static double power;
@@ -102,9 +144,9 @@ ISR(TIMER1_COMPA_vect){//PID
 
 void setup (){
 	
-	//ƒsƒ“•Ï‰»Š„‚èž‚Ý‹–‰ÂiPCINT8~15j
+	//ãƒ”ãƒ³å¤‰åŒ–å‰²ã‚Šè¾¼ã¿è¨±å¯ï¼ˆPCINT8~15ï¼‰
 	PCICR |= (1<<PCIE1);
-	//ƒsƒ“•Ï‰»Š„‚èž‚Ý‹–‰ÂiPCINT8j
+	//ãƒ”ãƒ³å¤‰åŒ–å‰²ã‚Šè¾¼ã¿è¨±å¯ï¼ˆPCINT8ï¼‰
 	PCMSK1 |= (1<<PCINT8);
 	motor_init();
 	motor_set_speed(pw);
