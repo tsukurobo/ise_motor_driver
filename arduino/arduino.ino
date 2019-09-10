@@ -19,7 +19,7 @@ void setup(){
 
 void loop(){
      m1.setSpeed(pw);
-     enc = m1.encorder();
+     enc = m1.encoder();
      Serial.println(enc);
      delay(1000);
 }

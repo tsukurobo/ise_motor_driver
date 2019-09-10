@@ -4,7 +4,7 @@
 
 // IseMotorDriver::IseMotorDriver(uint8_t i2caddr) {}
 // void IseMotorDriver::setSpeed(int power){}
-// long IseMotorDriver::encorder(){}
+// long IseMotorDriver::encoder(){}
 
 IseMotorDriver::IseMotorDriver(uint8_t i2caddr) :
 ti2c(i2caddr){
@@ -20,7 +20,7 @@ void IseMotorDriver::setSpeed(int power){
   this->ti2c.sendStr(buf); 
 }
 
-long IseMotorDriver::encorder(){
+long IseMotorDriver::encoder(){
   long count = 0;
   char buf[50];
   this -> ti2c.receiveStr(buf);
