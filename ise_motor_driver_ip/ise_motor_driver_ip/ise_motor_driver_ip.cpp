@@ -40,9 +40,9 @@ ISR(PCINT1_vect, ISR_NOBLOCK){//encorder
 
 void setup (){
 	
-	//�s���ω����荞�݋��iPCINT8~15�j
+	//ピン変化割り込み許可（PCINT8~15）
 	PCICR |= (1<<PCIE1);
-	//�s���ω����荞�݋��iPCINT8�j
+	//ピン変化割り込み許可（PCINT8）
 	PCMSK1 |= (1<<PCINT8);
 	motor_init();
 	motor_set_speed(pw);
