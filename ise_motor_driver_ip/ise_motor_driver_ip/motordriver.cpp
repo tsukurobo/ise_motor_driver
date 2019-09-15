@@ -19,22 +19,22 @@ enum{
 
 void motor_init(void) {
   //setup
-  DDRD |= 0b11100000;
+  DDRD |= 0b11110000;
 
-  TCCR0A = 0b10100011;  //highspeedPWM
+  TCCR0A = 0b10000011;  //highspeedPWM, OC0A:ON, OC0B:OFF
 
   TCCR0B = 0b00000010;  //1/8,Top=OVF
+
+  PORTD |= 0b00110000;
 }
 
 int pwm_map (int duty) {
   return TMR0INI + (int)(TOP/100*duty); //duty=0~100
 }
   
-  
-  
 void motor_set_speed (int power) {
   OCR0A = pwm_map(abs(power));
-  OCR0B = pwm_map(abs(power));
+  // OCR0B = pwm_map(abs(power));
 
   if (power < 0){
     //PORTD = 0b01100000;    //PHASE=high
